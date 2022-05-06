@@ -1,0 +1,18 @@
+{
+	"files.associations": {
+		"vector": "cpp",
+		"__split_buffer": "cpp",
+		"deque": "cpp",
+		"list": "cpp",
+		"string": "cpp",
+		"__hash_table": "cpp",
+		"__tree": "cpp",
+		"array": "cpp",
+		"memory_resource": "cpp",
+		"istream": "cpp",
+		"map": "cpp",
+		"memory": "cpp",
+		"string_view": "cpp",
+		"unordered_map": "cpp"
+	}
+}
