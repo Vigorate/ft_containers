@@ -6,17 +6,19 @@
 /*   By: amine <amine@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/19 15:29:31 by amine             #+#    #+#             */
-/*   Updated: 2022/05/31 21:54:56 by amine            ###   ########.fr       */
+/*   Updated: 2022/06/15 19:50:45 by amine            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#pragma once
 #include <iostream>
 #include <memory>
 #include <exception>
 #include <stdexcept>
 #include "vector_iterator.hpp"
 #include "../utils/enable_if.hpp"
-#include "../utils/lexicographical_compage.hpp"
+#include "../utils/lexicographical_compare.hpp"
+#include <vector>
 
 namespace ft
 {
@@ -106,40 +108,6 @@ namespace ft
 					reserve(n);
 				while (_size < n)
 					push_back(val);
-
-				
-				// pointer			n_arr;
-				// if (n < _size)
-				// {
-				// 	n_arr = _alloc.allocate(_capacity);
-				// 	for (size_type i = 0; i < n; ++i)
-				// 		_alloc.construct(&n_arr[i], _array[i]);
-				// 	for (int i = n; i < _size; ++ i)
-				// 		_alloc.destroy(&_array[i]);
-				// 	_alloc.deallocate(_array, _capacity);
-				// 	_size = n;
-				// 	_array = n_arr;
-				// }
-				// if (n > _size)
-				// {
-				// 	if (_capacity >= n)
-				// 	{
-				// 		for (size_type i = _size; i < n; ++i)
-				// 			n_arr[i], val;
-				// 		_size = n;
-				// 	}
-				// 	else
-				// 	{
-				// 		n_arr = _alloc.allocate(_capacity * 2);
-				// 		for (size_type i = 0; i < _size; ++i)
-				// 			_alloc.construct(&n_arr[i], _array[i]);
-				// 		for (size_type i = _size; i < n; ++i)
-				// 			n_arr[i] = val;
-				// 		_size = n;
-				// 		_capacity = _capacity * 2 > n ? _capacity * 2 : n;
-				// 		_array = n_arr;
-				// 	}
-				// }
 			};
 
 			size_type			capacity(void) const	{ return _capacity; };
@@ -249,9 +217,6 @@ namespace ft
 				_size = 0;
 			};
 
-
-			
-
 		private :
 			size_type						_size;
 			size_type						_capacity; //Always double capacity on array size max reached and need to realloc
@@ -271,13 +236,13 @@ namespace ft
 		return true;
 	}
 	template <class T, class Alloc>
-	bool operator!=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs) { !(lhs == rhs); }
+	bool operator!=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs) { return !(lhs == rhs); }
 	template <class T, class Alloc>
-	bool operator<(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs) { return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());}
+	bool operator<(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs) { return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()); }
 	template <class T, class Alloc>
 	bool operator>(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs) { return rhs < lhs; }
 	template <class T, class Alloc>
 	bool operator<=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs) { return !(lhs > rhs); }
 	template <class T, class Alloc>
-	bool operator>=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs) { return (!rhs < lhs); }
+	bool operator>=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs) { return !(lhs < rhs); }
 }
