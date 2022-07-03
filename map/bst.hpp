@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   map.hpp                                            :+:      :+:    :+:   */
+/*   bst.hpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: amine <amine@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/07/03 18:11:41 by amine             #+#    #+#             */
-/*   Updated: 2022/07/03 18:30:08 by amine            ###   ########.fr       */
+/*   Created: 2022/07/03 18:33:43 by amine             #+#    #+#             */
+/*   Updated: 2022/07/03 18:42:41 by amine            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,8 @@
 
 namespace ft
 {
-	
-	template < class Key, class T, class Comapre = less<Key>, class Alloc = allocator< pair<const Key,T> >>
-	class map
+	template < class T, class Compare = std::less<typename T::first_type>, class Alloc = std::allocator<T> >
+	class	Bst
 	{
 		public:
 			typedef				Key									key_type;
@@ -33,10 +32,25 @@ namespace ft
 			typedef				ptrdiff_t							difference_type;
 			typedef				size_t								size_type;
 
-			//				CONSTRUCTOR
-			explicit	map (const allocator_type &alloc = allocator_type())
-
+		class	Node
+		{
+			public:
+				Node	*min() {}
+				Node	*max() {}
+			
 			private:
-				
+				value		_pair;
+				Node		*_up;
+				Node		*_left
+				Node		*_right;
+				int			height;
+				int			balance;
+		};
+
+		private:
+			Node			*_start;
+			Node			*_end;
+			size_type		_size;
+			allocator_type	_alloc;
 	};
 }
