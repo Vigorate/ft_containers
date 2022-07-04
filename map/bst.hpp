@@ -6,11 +6,14 @@
 /*   By: amine <amine@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/03 18:33:43 by amine             #+#    #+#             */
-/*   Updated: 2022/07/03 18:42:41 by amine            ###   ########.fr       */
+/*   Updated: 2022/07/04 23:30:36 by amine            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
+
+#include <iostream>
+#include <memory>
 
 namespace ft
 {
@@ -37,8 +40,6 @@ namespace ft
 			public:
 				Node	*min() {}
 				Node	*max() {}
-			
-			private:
 				value		_pair;
 				Node		*_up;
 				Node		*_left
@@ -47,10 +48,17 @@ namespace ft
 				int			balance;
 		};
 
+		Bst(const value_compare &_compare = value_compare(), const allocator_type &alloc = allocator_type()) : _alloc(alloc), _compare(compare)
+		{
+			
+		}
+
 		private:
-			Node			*_start;
-			Node			*_end;
-			size_type		_size;
-			allocator_type	_alloc;
+			Node					*_start;
+			Node					*_end;
+			size_type				_size;
+			allocator_type			_alloc;
+			std::allocator<Node>	_allocNode;
+			key_compare				_compare;
 	};
 }
