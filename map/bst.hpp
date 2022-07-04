@@ -6,7 +6,7 @@
 /*   By: amine <amine@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/03 18:33:43 by amine             #+#    #+#             */
-/*   Updated: 2022/07/03 18:42:41 by amine            ###   ########.fr       */
+/*   Updated: 2022/07/04 09:20:45 by amine            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,5 +52,6 @@ namespace ft
 			Node			*_end;
 			size_type		_size;
 			allocator_type	_alloc;
+			
 	};
 }
