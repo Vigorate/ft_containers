@@ -6,7 +6,7 @@
 /*   By: ambelkac <ambelkac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 17:46:37 by amine             #+#    #+#             */
-/*   Updated: 2022/08/09 11:53:51 by ambelkac         ###   ########.fr       */
+/*   Updated: 2022/08/09 12:32:00 by ambelkac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -171,21 +171,20 @@ namespace ft
 				return &(operator*)();
 			}
 
-			map_iterator &operator++()
+			reverse_map_iterator &operator++()
 			{
-				key_type		key;
-				Node			*tmp;
-
-				if (this->_begin->right)
+				// find the smallest greater
+				if (this->_begin->left)
 				{
-					this->_begin = this->_begin->right->min();
+					this->_begin = this->_begin->left->max();
 					return *this;
 				}
 				else if (this->_begin->parent)
 				{
-					key = this->_begin->pair.first;
-					tmp = this->_begin->parent;
-					while (tmp && this->_comp(tmp->pair.first, key))
+					// find first previous greater node
+					key_type key = this->_begin->pair.first;
+					Node *tmp = this->_begin->parent;
+					while (tmp && this->_comp(key, tmp->pair.first))
 						tmp = tmp->parent;
 					if (tmp)
 					{
@@ -197,21 +196,20 @@ namespace ft
 				return *this;
 			}
 
-			map_iterator &operator--()
+			reverse_map_iterator &operator--()
 			{
-				key_type		key;
-				Node			*tmp;
-
-				if (this->_begin->left)
+				// find the smallest greater
+				if (this->_begin->right)
 				{
-					this->_begin = this->_begin->left->max();
+					this->_begin = this->_begin->right->min();
 					return *this;
 				}
 				else if (this->_begin->parent)
 				{
-					key = this->_begin->pair.first;
-					tmp = this->_begin->parent;
-					while (tmp && this->_comp(key, tmp->pair.first))
+					// find first previous greater node
+					key_type key = this->_begin->pair.first;
+					Node *tmp = this->_begin->parent;
+					while (tmp && this->_comp(tmp->pair.first, key))
 						tmp = tmp->parent;
 					if (tmp)
 					{

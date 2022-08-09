@@ -6,7 +6,7 @@
 /*   By: ambelkac <ambelkac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/19 15:29:31 by amine             #+#    #+#             */
-/*   Updated: 2022/08/09 10:18:38 by ambelkac         ###   ########.fr       */
+/*   Updated: 2022/08/09 14:39:42 by ambelkac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,9 @@ namespace ft
 			typedef	typename	allocator_type::pointer							pointer;
 			typedef	typename	allocator_type::const_pointer					const_pointer;
 			typedef				vector_iterator<random_access_iterator_tag, T>	iterator;
-			typedef				vector_iterator<random_access_iterator_tag, T>	const_iterator;
+			typedef				vector_iterator<random_access_iterator_tag, const T>	const_iterator;
+			typedef				reverse_vector_iterator<random_access_iterator_tag, T>	reverse_iterator;
+			typedef				reverse_vector_iterator<random_access_iterator_tag, const T>	const_reverse_iterator;
 			typedef				ptrdiff_t										difference_type;
 			typedef				size_t											size_type;
 
@@ -67,7 +69,6 @@ namespace ft
 					_alloc.construct(&_array[i], x._array[i]);
 			};
 
-
 			//				DESTRUCTOR
 			~vector(void)
 			{
@@ -75,7 +76,6 @@ namespace ft
 					_alloc.destroy(&_array[i]);
 				_alloc.deallocate(_array, _capacity);
 			};
-
 
 			//				OPERATOR OVERLOAD
 			vector		&operator=(vector const & src)
@@ -88,14 +88,18 @@ namespace ft
 			};
 
 			//				ITERATOR
-			vector_iterator<random_access_iterator_tag, value_type>			begin()			{ return vector_iterator<random_access_iterator_tag, value_type>(_array); };
-			const_iterator		begin()			const { return const_iterator(_array); };
+			iterator			begin()				{ return iterator(_array); };
+			iterator			end()				{ return (iterator( _array) + size()); };
 
-			vector_iterator<random_access_iterator_tag, value_type>			end()			{ return (vector_iterator<random_access_iterator_tag, value_type>( _array) + size()); };
-			const_iterator		end()			const { return (const_iterator(_array) + size()); };
+			const_iterator		cbegin() const		{ return const_iterator(_array); };
+			const_iterator		cend() const		{ return (const_iterator(_array) + size()); };
 
-			reverse_vector_iterator<random_access_iterator_tag, value_type> rbegin() { return reverse_vector_iterator<random_access_iterator_tag, value_type>(this->_begin) + _size - 1; }
-			reverse_vector_iterator<random_access_iterator_tag, value_type> rend() { return reverse_vector_iterator<random_access_iterator_tag, value_type>(this->_begin) - 1; }
+			reverse_iterator rbegin()				{ return reverse_iterator(_array) + size() - 1; }
+			reverse_iterator rend()					{ return reverse_iterator(_array) - 1; }
+
+			const_reverse_iterator crbegin() const	{ return const_reverse_iterator(_array) + size() - 1; }
+			const_reverse_iterator crend() const	{ return const_reverse_iterator(_array) - 1; }
+
 
 			//				CAPACITY
 			size_type			size(void) const		{ return _size; };
@@ -238,13 +242,13 @@ namespace ft
 		return true;
 	}
 	template <class T, class Alloc>
-	bool operator!=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs) { return !(lhs == rhs); }
+	bool operator!=( vector<T, Alloc> &lhs,  vector<T, Alloc> &rhs) { return !(lhs == rhs); }
 	template <class T, class Alloc>
-	bool operator<(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs) { return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()); }
+	bool operator<( vector<T, Alloc> &lhs,  vector<T, Alloc> &rhs) { return lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end()); }
 	template <class T, class Alloc>
-	bool operator>(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs) { return rhs < lhs; }
+	bool operator>( vector<T, Alloc> &lhs,  vector<T, Alloc> &rhs) { return rhs < lhs; }
 	template <class T, class Alloc>
-	bool operator<=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs) { return !(lhs > rhs); }
+	bool operator<=( vector<T, Alloc> &lhs,  vector<T, Alloc> &rhs) { return !(lhs > rhs); }
 	template <class T, class Alloc>
-	bool operator>=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs) { return !(lhs < rhs); }
+	bool operator>=( vector<T, Alloc> &lhs,  vector<T, Alloc> &rhs) { return !(lhs < rhs); }
 }
