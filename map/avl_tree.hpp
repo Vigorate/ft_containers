@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   avl_tree.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amine <amine@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ambelkac <ambelkac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 20:36:09 by amine             #+#    #+#             */
-/*   Updated: 2022/08/02 18:18:38 by amine            ###   ########.fr       */
+/*   Updated: 2022/08/09 11:52:30 by ambelkac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ namespace ft
 	template <class T, class Compare = std::less<typename T::first_type>, class Alloc = std::allocator<T> >
 	class Tree
 	{
+	public:
 		typedef	Alloc						allocator_type;
 		typedef T							value_type;
 		typedef typename T::first_type		key_type;
@@ -32,7 +33,24 @@ namespace ft
 		typedef T							&reference;
 		typedef T							*pointer;
 
-	public:
+		class value_compare
+		{
+			friend class Tree;
+
+			typedef bool			result_type;
+			typedef value_type		first_type;
+			typedef value_type		second_type;
+
+			protected:
+				Compare		comp;
+				value_compare(key_compare c) : comp(c) {}
+
+			public:
+				bool operator()(const first_type &i, const second_type &j) const
+				{ return comp(i.first, j.first); }
+		};
+
+		value_compare value_comp() const { return value_compare(this->_comp); }
 
 		struct Node
 		{
@@ -369,25 +387,6 @@ namespace ft
 				_end->parent = nullptr;
 			_end->left = _end->right = nullptr;
 		}
-
-		class value_compare
-		{
-			friend class Tree;
-
-			typedef bool			result_type;
-			typedef value_type		first_type;
-			typedef value_type		second_type;
-
-			protected:
-				Compare		comp;
-				value_compare(key_compare c) : comp(c) {}
-
-			public:
-				bool operator()(const value_type &x, const value_type &y) const
-				{ return comp(x.first, y.first); }
-		};
-
-		value_compare value_comp() const { return value_compare(this->_comp); }
 
 	private:
 		allocator_type			_allocValue;

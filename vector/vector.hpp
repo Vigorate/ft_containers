@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   vector.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amine <amine@student.42.fr>                +#+  +:+       +#+        */
+/*   By: ambelkac <ambelkac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/19 15:29:31 by amine             #+#    #+#             */
-/*   Updated: 2022/08/01 00:33:45 by amine            ###   ########.fr       */
+/*   Updated: 2022/08/09 10:18:38 by ambelkac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 #include "vector_iterator.hpp"
 #include "../utils/enable_if.hpp"
 #include "../utils/lexicographical_compare.hpp"
-#include <vector>
+
 
 namespace ft
 {
@@ -88,12 +88,14 @@ namespace ft
 			};
 
 			//				ITERATOR
-			iterator			begin()			{ return iterator(_array); };
+			vector_iterator<random_access_iterator_tag, value_type>			begin()			{ return vector_iterator<random_access_iterator_tag, value_type>(_array); };
 			const_iterator		begin()			const { return const_iterator(_array); };
 
-			iterator			end()			{ return (iterator( _array) + size()); };
-			const_iterator		end()			const { return const_iterator(_array); };
+			vector_iterator<random_access_iterator_tag, value_type>			end()			{ return (vector_iterator<random_access_iterator_tag, value_type>( _array) + size()); };
+			const_iterator		end()			const { return (const_iterator(_array) + size()); };
 
+			reverse_vector_iterator<random_access_iterator_tag, value_type> rbegin() { return reverse_vector_iterator<random_access_iterator_tag, value_type>(this->_begin) + _size - 1; }
+			reverse_vector_iterator<random_access_iterator_tag, value_type> rend() { return reverse_vector_iterator<random_access_iterator_tag, value_type>(this->_begin) - 1; }
 
 			//				CAPACITY
 			size_type			size(void) const		{ return _size; };
