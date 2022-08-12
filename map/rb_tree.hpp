@@ -6,7 +6,7 @@
 /*   By: ambelkac <ambelkac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 20:36:09 by amine             #+#    #+#             */
-/*   Updated: 2022/08/12 14:00:35 by ambelkac         ###   ########.fr       */
+/*   Updated: 2022/08/12 15:23:19 by ambelkac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,7 @@ namespace ft
 
 			size_type	size() const { return size(_base); }
 			size_type	max_size() const { return allocator_type().max_size(); }
-			pointer		search(const value_type& key) const { return __search_wrapper(_base, key); }
+			pointer		search(const value_type& key) const { return search_node(_base, key); }
 
 			pointer		successor(pointer node) const
 			{
@@ -190,7 +190,7 @@ namespace ft
 
 				if (s->parent->parent == NULL)
 					return true;
-				_fix_insertion(s);
+				balance_insertion(s);
 				return true;
 			}
 
@@ -246,16 +246,15 @@ namespace ft
 				ref._end = tmp_last;
 			}
 
-
 		private:
-			pointer		__search_wrapper(pointer node, const value_type& key) const
+			pointer		search_node(pointer node, const value_type& key) const
 			{
 				if (node == _end)
 					return node;
 				else if (_comp(key, node->val))
-					return __search_wrapper(node->left, key);
+					return search_node(node->left, key);
 				else if (_comp(node->val, key))
-					return __search_wrapper(node->right, key);
+					return search_node(node->right, key);
 				else
 					return node;
 			}
@@ -296,7 +295,7 @@ namespace ft
 				node->parent = y;
 			}
 
-			void		_fix_insertion(pointer node)
+			void		balance_insertion(pointer node)
 			{
 				pointer	u;
 				
@@ -352,7 +351,7 @@ namespace ft
 				_base->color = BLACK_NODE;
 			}
 
-			void		_fix_delete(pointer node)
+			void		balance_erase(pointer node)
 			{
 				pointer	s;
 				
@@ -495,7 +494,7 @@ namespace ft
 				allocator_type().deallocate(z, 1);
 				
 				if (y_original_color == BLACK_NODE)
-					_fix_delete(x);
+					balance_erase(x);
 				return true;
 			}
 

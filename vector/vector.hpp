@@ -6,7 +6,7 @@
 /*   By: ambelkac <ambelkac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/19 15:29:31 by amine             #+#    #+#             */
-/*   Updated: 2022/08/11 18:34:02 by ambelkac         ###   ########.fr       */
+/*   Updated: 2022/08/12 22:09:14 by ambelkac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -232,8 +232,16 @@ namespace ft
 				return begin() + n;
 			}
 			// fill
+
+
 			void 			insert (iterator position, size_type n, const value_type& val)
 			{
+				if (!_size)
+				{
+					for (; n > 0; --n)
+						push_back(val);
+					return ;
+				}
 				size_t		old_end = _size - 1;
 				size_t		pos_idx = distance(begin(), position);
 				size_t		back_len = _size + n - pos_idx - 1;
@@ -249,6 +257,12 @@ namespace ft
 			template <class InputIterator>
 			void			insert (iterator position, InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type * = 0)
 			{
+				if (!_size)
+				{
+					for (; first != last; ++first)
+						push_back(*first);
+					return ;
+				}
 				size_t		old_end = _size - 1;
 				size_t		pos_idx = distance(begin(), position);
 				size_t		n = distance(first, last);
@@ -260,16 +274,6 @@ namespace ft
 				for (; first != last; ++pos_idx, ++first)
 					_array[pos_idx] = *first;
 			}
-			
-			// iterator erase (iterator position)
-			// {
-			// 	size_t		idx = distance(begin(), position) - 1;
-
-			// 	for (; idx < _size - 1; ++idx)
-			// 		_array[idx] = _array[idx + 1];
-			// 	resize(_size - 1);
-			// 	return (position);
-			// }
 
 			iterator erase(iterator position)
 			{
@@ -317,7 +321,6 @@ namespace ft
 				for (size_t i = 0; i < _size; ++i)
 					_alloc.destroy(&_array[i]);
 				_size = 0;
-				_array = NULL;
 			}
 
 			template <class InputIt>
