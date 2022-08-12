@@ -6,7 +6,7 @@
 /*   By: ambelkac <ambelkac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/03 18:11:41 by amine             #+#    #+#             */
-/*   Updated: 2022/08/12 13:12:14 by ambelkac         ###   ########.fr       */
+/*   Updated: 2022/08/12 22:57:30 by ambelkac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,11 +54,11 @@ namespace ft
 			class value_compare : public ft::binary_function<value_type, value_type, bool>
 			{
 				friend class map;
-				
+
 				protected:
 					key_compare	comp;
 					value_compare(key_compare c) : comp(c) {}
-					
+
 				public:
 					bool	operator()(const value_type& x, const value_type& y) const
 					{ return comp(x.first, y.first); }
