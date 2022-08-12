@@ -6,7 +6,7 @@
 /*   By: ambelkac <ambelkac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/01 20:41:00 by amine             #+#    #+#             */
-/*   Updated: 2022/08/09 13:24:53 by ambelkac         ###   ########.fr       */
+/*   Updated: 2022/08/11 22:13:15 by ambelkac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,29 @@
 
 namespace ft
 {
-	template <class InputIt1, class InputIt2>
-	bool lexicographical_compare(InputIt1 first1, InputIt1 last1, InputIt2 first2, InputIt2 last2)
+	template <class InputIte1, class InputIte2>
+	bool lexicographical_compare(InputIte1 first1, InputIte1 last1,
+								 InputIte2 first2, InputIte2 last2)
 	{
-		for (; (first1 != last1) && (first2 != last2); ++first1, ++first2)
+		for (; first1 != last1; ++first1, ++first2)
 		{
-			if (*first1 < *first2)
-				return true;
-			if (*first2 < *first1)
+			if (first2 == last2 || *first2 < *first1)
 				return false;
+			else if (*first1 < *first2)
+				return true;
 		}
-		return (first1 == last1);
+		return (first2 != last2);
 	}
+
+	template <class InputIte1, class InputIte2>
+	bool	equal(InputIte1 first1, InputIte1 last1, InputIte2 first2)
+	{
+	for ( ; first1 != last1; ++first1, ++first2)
+	{
+		if (!(*first1 == *first2))
+			return false;
+	}
+	return true;
+}
+
 }

@@ -6,171 +6,336 @@
 /*   By: ambelkac <ambelkac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/06 15:45:00 by amine             #+#    #+#             */
-/*   Updated: 2022/08/09 10:28:13 by ambelkac         ###   ########.fr       */
+/*   Updated: 2022/08/11 22:12:52 by ambelkac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 #include "../utils/iterator_traits.hpp"
 #include "../utils/enable_if.hpp"
+#include <cstddef>
 
 namespace ft
 {
-	template <class Category, class T, class Distance = ptrdiff_t, class Reference = T&, class Pointer = T*>
-	class vector_iterator
+	template <class Ite>
+	class random_access_iterator : public iterator<random_access_iterator_tag, Ite>
 	{
-		public:
-			typedef	T			value_type;
-			typedef	Distance	difference_type;
-			typedef	Pointer		pointer;
-			typedef	Reference	reference;
-			typedef	Category	iterator_category;
-			
-			vector_iterator(T *pointer) { _ptr = pointer; }
+	public:
+		typedef typename ft::iterator<random_access_iterator_tag, Ite>::value_type value_type;
+		typedef typename ft::iterator<random_access_iterator_tag, Ite>::difference_type difference_type;
+		typedef typename ft::iterator<random_access_iterator_tag, Ite>::pointer pointer;
+		typedef typename ft::iterator<random_access_iterator_tag, Ite>::reference reference;
+		typedef typename ft::iterator<random_access_iterator_tag, Ite>::iterator_category iterator_category;
 
-			vector_iterator(const vector_iterator &src) { _ptr = src._ptr; }
+		random_access_iterator() : _cur(0) {}
 
-			virtual	~vector_iterator() {};
+		random_access_iterator(pointer x) : _cur(x) {}
 
-			vector_iterator		&operator=(const vector_iterator &other)
-			{
-				_ptr = other._ptr;
+		random_access_iterator(const random_access_iterator &u) : _cur(u.base()) {}
+
+		virtual ~random_access_iterator() {}
+
+		random_access_iterator &operator=(const random_access_iterator &u)
+		{
+			if (this == &u)
 				return *this;
-			}
 
-			vector_iterator		&operator++()
-			{
-				_ptr++;
-				return *this;
-			}
-			
-			vector_iterator		&operator--()
-			{
-				_ptr--;
-				return *this;
-			}
+			_cur = u.base();
+			return *this;
+		}
 
-			vector_iterator		operator++(int)
-			{
-				vector_iterator	tmp = *this;
-				_ptr++;
-				return tmp;
-			}
+		pointer base() const
+		{
+			return _cur;
+		}
 
-			vector_iterator		operator--(int)
-			{
-				vector_iterator	tmp = *this;
-				_ptr--;
-				return tmp;
-			}
+		reference operator*() const
+		{
+			return *_cur;
+		}
 
-			vector_iterator		operator+(int i)
-			{
-				_ptr += i;
-				return *this;
-			}
+		pointer operator->() const
+		{
+			return &(operator*());
+		}
 
-			vector_iterator		operator-(int i)
-			{
-				_ptr -= i;
-				return *this;
-			}
+		random_access_iterator &operator++()
+		{
+			++_cur;
+			return *this;
+		}
 
-			bool	operator==(const vector_iterator &other) const { return _ptr == other._ptr; }
-			bool	operator!=(const vector_iterator &other) const { return _ptr != other._ptr; }
-			bool	operator>(const vector_iterator &other) const { return _ptr > other._ptr; }
-			bool	operator<(const vector_iterator &other) const { return _ptr < other._ptr; }
-			bool	operator>=(const vector_iterator &other) const { return _ptr >= other._ptr; }
-			bool	operator<=(const vector_iterator &other) const { return _ptr <= other._ptr; }
-			
-			T	&operator*() { return *_ptr; };
-			T	*operator->() { return &(operator*)(); };
+		random_access_iterator operator++(int)
+		{
+			random_access_iterator tmp(*this);
+			++_cur;
+			return tmp;
+		}
 
-		private:
-			T	*_ptr;
+		random_access_iterator &operator--()
+		{
+			--_cur;
+			return *this;
+		}
+
+		random_access_iterator operator--(int)
+		{
+			random_access_iterator tmp(*this);
+			--_cur;
+			return tmp;
+		}
+
+		random_access_iterator operator+(difference_type n)
+		{
+			return random_access_iterator(_cur + n);
+		}
+
+		random_access_iterator &operator+=(difference_type n)
+		{
+			_cur += n;
+			return *this;
+		}
+
+		random_access_iterator operator-(difference_type n)
+		{
+			return random_access_iterator(_cur - n);
+		}
+
+		random_access_iterator &operator-=(difference_type n)
+		{
+			_cur -= n;
+			return *this;
+		}
+
+		reference operator[](difference_type n) const
+		{
+			return *(_cur + n);
+		}
+
+		// needed for conversion to a const_iterator
+		operator random_access_iterator<const Ite>(void)
+		{
+			return random_access_iterator<const Ite>(_cur);
+		}
+
+	private:
+		pointer _cur;
 	};
 
-	template <class Category, class T, class Distance = ptrdiff_t, class Reference = T &, class Pointer = T *>
-	class reverse_vector_iterator
+	template <class Iterator>
+	random_access_iterator<Iterator> operator+(int n, const random_access_iterator<Iterator> &x)
 	{
-		public:
-			typedef	T			value_type;
-			typedef	Distance	difference_type;
-			typedef	Pointer		pointer;
-			typedef	Reference	reference;
-			typedef	Category	iterator_category;
+		return random_access_iterator<Iterator>(x.base() + n);
+	}
 
-			reverse_vector_iterator(T *pointer) { _ptr = pointer; }
+	template <class IteratorL, class IteratorR>
+	int operator-(const random_access_iterator<IteratorL> &lhs, const random_access_iterator<IteratorR> &rhs)
+	{
+		return lhs.base() - rhs.base();
+	}
 
-			reverse_vector_iterator(const reverse_vector_iterator &other) { _ptr = other._ptr; }
+	template <class IteratorL, class IteratorR>
+	bool operator==(const random_access_iterator<IteratorL> &lhs,
+					const random_access_iterator<IteratorR> &rhs)
+	{
+		return lhs.base() == rhs.base();
+	}
 
-			virtual ~reverse_vector_iterator(){};
+	template <class IteratorL, class IteratorR>
+	bool operator!=(const random_access_iterator<IteratorL> &lhs,
+					const random_access_iterator<IteratorR> &rhs)
+	{
+		return lhs.base() != rhs.base();
+	}
 
-			reverse_vector_iterator &operator=(const reverse_vector_iterator &other)
-			{
-				_ptr = other._ptr;
+	template <class IteratorL, class IteratorR>
+	bool operator<(const random_access_iterator<IteratorL> &lhs,
+				   const random_access_iterator<IteratorR> &rhs)
+	{
+		return lhs.base() < rhs.base();
+	}
+
+	template <class IteratorL, class IteratorR>
+	bool operator<=(const random_access_iterator<IteratorL> &lhs,
+					const random_access_iterator<IteratorR> &rhs)
+	{
+		return lhs.base() <= rhs.base();
+	}
+
+	template <class IteratorL, class IteratorR>
+	bool operator>(const random_access_iterator<IteratorL> &lhs,
+				   const random_access_iterator<IteratorR> &rhs)
+	{
+		return lhs.base() > rhs.base();
+	}
+
+	template <class IteratorL, class IteratorR>
+	bool operator>=(const random_access_iterator<IteratorL> &lhs,
+					const random_access_iterator<IteratorR> &rhs)
+	{
+		return lhs.base() >= rhs.base();
+	}
+
+	/* Reverse Iterator */
+	template <class Ite>
+	class reverse_iterator : public iterator<typename iterator_traits<Ite>::iterator_category,
+											 typename iterator_traits<Ite>::value_type,
+											 typename iterator_traits<Ite>::difference_type,
+											 typename iterator_traits<Ite>::pointer,
+											 typename iterator_traits<Ite>::reference>
+	{
+	public:
+		typedef Ite												iterator_type;
+		typedef typename iterator_traits<Ite>::difference_type	difference_type;
+		typedef typename iterator_traits<Ite>::reference		reference;
+		typedef typename iterator_traits<Ite>::pointer			pointer;
+
+		reverse_iterator() : _cur() {}
+
+		explicit reverse_iterator(Ite x) : _cur(x) {}
+
+		template <class U>
+		reverse_iterator(const reverse_iterator<U> &u) : _cur(u.base()) {}
+
+		template <class U>
+		reverse_iterator &operator=(const reverse_iterator<U> &u)
+		{
+			if (*this == u)
 				return *this;
-			}
 
-			reverse_vector_iterator &operator++()
-			{
-				_ptr++;
-				return *this;
-			}
+			_cur = u.base();
+			return *this;
+		}
 
-			reverse_vector_iterator &operator--()
-			{
-				_ptr--;
-				return *this;
-			}
+		Ite base() const
+		{
+			return _cur;
+		}
 
-			reverse_vector_iterator operator++(int)
-			{
-				reverse_vector_iterator	tmp = *this;
-				_ptr--;
-				return tmp;
-			}
+		reference operator*() const
+		{
+			iterator_type cpy = _cur;
+			return *--cpy;
+		}
 
-			reverse_vector_iterator operator--(int)
-			{
-				reverse_vector_iterator	tmp = *this;
-				_ptr++;
-				return tmp;
-			}
+		pointer operator->() const
+		{
+			return &(operator*());
+		}
 
-			reverse_vector_iterator &operator+(int i)
-			{
-				_ptr += i;
-				return *this;
-			}
+		reverse_iterator &operator++()
+		{
+			--_cur;
+			return *this;
+		}
 
-			reverse_vector_iterator &operator-(int i)
-			{
-				_ptr -= i;
-				return *this;
-			}
+		reverse_iterator operator++(int)
+		{
+			reverse_iterator tmp(*this);
+			--_cur;
+			return tmp;
+		}
 
-			bool	operator==(const reverse_vector_iterator &other) const { return _ptr == other._ptr; }
-			bool	operator!=(const reverse_vector_iterator &other) const { return _ptr != other._ptr; }
-			bool	operator>(const reverse_vector_iterator &other) const { return _ptr > other._ptr; }
-			bool	operator<(const reverse_vector_iterator &other) const { return _ptr < other._ptr; }
-			bool	operator>=(const reverse_vector_iterator &other) const { return _ptr >= other._ptr; }
-			bool	operator<=(const reverse_vector_iterator &other) const { return _ptr <= other._ptr; }
+		reverse_iterator &operator--()
+		{
+			++_cur;
+			return *this;
+		}
 
-			friend reverse_vector_iterator operator-(difference_type n, const reverse_vector_iterator &it)
-			{
-				return reverse_vector_iterator(it._ptr - n);
-			}
-			friend difference_type operator-(const reverse_vector_iterator &a, const reverse_vector_iterator &b)
-			{
-				return (a._ptr - b._ptr);
-			}
+		reverse_iterator operator--(int)
+		{
+			reverse_iterator tmp(*this);
+			++_cur;
+			return tmp;
+		}
 
-			T &operator*() { return *_ptr; }
-			T *operator->() { return &(operator*)(); }
+		reverse_iterator operator+(difference_type n)
+		{
+			return reverse_iterator(_cur - n);
+		}
 
-		private:
-			T	*_ptr;
+		reverse_iterator &operator+=(difference_type n)
+		{
+			_cur -= n;
+			return *this;
+		}
 
+		reverse_iterator operator-(difference_type n)
+		{
+			return reverse_iterator(_cur + n);
+		}
+
+		reverse_iterator &operator-=(difference_type n)
+		{
+			_cur += n;
+			return *this;
+		}
+
+		reference operator[](difference_type n)
+		{
+			return (*(*this + n));
+		}
+
+		operator reverse_iterator<const Ite>(void)
+		{
+			return reverse_iterator<const Ite>(_cur);
+		}
+
+	protected:
+		Ite _cur;
 	};
+
+	template <class _Ite>
+	reverse_iterator<_Ite> operator+(long n, const reverse_iterator<_Ite> &x)
+	{
+		return reverse_iterator<_Ite>(x.base() - n);
+	}
+
+	template <class IteratorL, class IteratorR>
+	long operator-(const reverse_iterator<IteratorL> &lhs, const reverse_iterator<IteratorR> &rhs)
+	{
+		return rhs.base() - lhs.base();
+	}
+
+	template <class IteratorL, class IteratorR>
+	bool operator==(const reverse_iterator<IteratorL> &lhs,
+					const reverse_iterator<IteratorR> &rhs)
+	{
+		return lhs.base() == rhs.base();
+	}
+
+	template <class IteratorL, class IteratorR>
+	bool operator!=(const reverse_iterator<IteratorL> &lhs,
+					const reverse_iterator<IteratorR> &rhs)
+	{
+		return lhs.base() != rhs.base();
+	}
+
+	template <class IteratorL, class IteratorR>
+	bool operator<(const reverse_iterator<IteratorL> &lhs,
+				   const reverse_iterator<IteratorR> &rhs)
+	{
+		return lhs.base() > rhs.base();
+	}
+
+	template <class IteratorL, class IteratorR>
+	bool operator<=(const reverse_iterator<IteratorL> &lhs,
+					const reverse_iterator<IteratorR> &rhs)
+	{
+		return lhs.base() >= rhs.base();
+	}
+
+	template <class IteratorL, class IteratorR>
+	bool operator>(const reverse_iterator<IteratorL> &lhs,
+				   const reverse_iterator<IteratorR> &rhs)
+	{
+		return lhs.base() < rhs.base();
+	}
+
+	template <class IteratorL, class IteratorR>
+	bool operator>=(const reverse_iterator<IteratorL> &lhs,
+					const reverse_iterator<IteratorR> &rhs)
+	{
+		return lhs.base() <= rhs.base();
+	}
 }

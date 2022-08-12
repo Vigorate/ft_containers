@@ -6,237 +6,161 @@
 /*   By: ambelkac <ambelkac@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/08/02 17:46:37 by amine             #+#    #+#             */
-/*   Updated: 2022/08/09 12:32:00 by ambelkac         ###   ########.fr       */
+/*   Updated: 2022/08/12 13:38:15 by ambelkac         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
-//#include "../utils/iterator_traits.hpp"
+#include <cstddef>
+#include "../utils/iterator_traits.hpp"
 
 namespace ft
 {
-	template <class Category, class T, class notconst_T = T>
-	class map_iterator
+	template <class T, class Node>
+	class tree_iterator : public iterator<bidirectional_iterator_tag, T>
 	{
-		public:
-			typedef typename T::value_type		value_type;
-			typedef typename notconst_T::Node	Node;
-			typedef typename T::key_type		key_type;
-			typedef typename T::mapped_type		mapped_type;
-			typedef typename T::key_compare		key_compare;
-			typedef typename T::pointer			pointer;
-			typedef typename T::reference		reference;
-			typedef ptrdiff_t					difference_type;
-			typedef Category					iterator_category;
+	public:
+		typedef T													value_type;
+		typedef iterator<bidirectional_iterator_tag, value_type>	iterator_type;
+		typedef typename iterator_type::iterator_category			iterator_category;
+		typedef typename iterator_type::difference_type				difference_type;
+		typedef typename iterator_type::pointer						pointer;
+		typedef typename iterator_type::reference					reference;
+		typedef Node												node_type;
+		typedef Node												*node_pointer;
 
-			map_iterator() {}
-			map_iterator(const map_iterator<Category, notconst_T> &toCopy) : _begin(toCopy.base()), _end(toCopy.end()) {}
-			map_iterator(Node *node, Node *end) : _begin(node), _end(end) {}
+		tree_iterator(void) : _base(NULL), _end(NULL), _cur(NULL) {}
+		
+		tree_iterator(node_pointer const& begin, node_pointer const& end, node_pointer const& current) : _base(begin), _end(end), _cur(current) {}
 
-			virtual ~map_iterator() {}
+		tree_iterator(tree_iterator const& src) { *this = src; }
 
-			Node *base() const { return _begin; }
-			Node *end() const { return _end; }
+		tree_iterator&		operator=(const tree_iterator& src)
+		{
+			if (this == &src)
+				return *this;
+			
+			_base = src._base;
+			_end = src._end;
+			_cur = src._cur;
+			return *this;
+		}
+		
+		~tree_iterator() {}
 
-			bool operator!=(const map_iterator<Category, T, notconst_T> &rhs) const
-			{ return this->_begin != rhs._begin; }
+		node_pointer		base(void) const
+		{
+			return _cur;
+		}
 
-			bool operator==(const map_iterator<Category, T, notconst_T> &rhs) const
-			{ return this->_begin == rhs._begin; }
+		reference			operator*() const
+		{
+			return _cur->val;
+		}
 
-			reference operator*() const { return this->_begin->pair; }
+		pointer				operator->() const
+		{
+			return &(operator*());
+		}
 
-			pointer operator->() const
+		tree_iterator&		operator++()
+		{
+			if (_cur == max(_base))
 			{
-				if (this->_begin == nullptr)
-					return nullptr;
-				return &(operator*)();
-			}
-
-			map_iterator &operator++()
-			{
-				key_type		key;
-				Node			*tmp;
-
-				if (this->_begin->right)
-				{
-					this->_begin = this->_begin->right->min();
-					return *this;
-				}
-				else if (this->_begin->parent)
-				{
-					key = this->_begin->pair.first;
-					tmp = this->_begin->parent;
-					while (tmp && this->_comp(tmp->pair.first, key))
-						tmp = tmp->parent;
-					if (tmp)
-					{
-						this->_begin = tmp;
-						return *this;
-					}
-				}
-				this->_begin = this->_end;
+				_cur = _end;
 				return *this;
 			}
-
-			map_iterator &operator--()
+			else if (_cur == _end)
 			{
-				key_type		key;
-				Node			*tmp;
-
-				if (this->_begin->left)
-				{
-					this->_begin = this->_begin->left->max();
-					return *this;
-				}
-				else if (this->_begin->parent)
-				{
-					key = this->_begin->pair.first;
-					tmp = this->_begin->parent;
-					while (tmp && this->_comp(key, tmp->pair.first))
-						tmp = tmp->parent;
-					if (tmp)
-					{
-						this->_begin = tmp;
-						return *this;
-					}
-				}
-				this->_begin = this->_end;
+				_cur = NULL;
 				return *this;
 			}
+			_cur = successor(_cur);
+			return *this;
+		}
 
-			map_iterator operator++(int)
+		tree_iterator		operator++(int)
+		{
+			tree_iterator	tmp(*this);
+			operator++();
+			return tmp;
+		}
+
+		tree_iterator&		operator--()
+		{
+			if (_cur == _end)
 			{
-				map_iterator	tmp = *this;
-				++*this;
-				return tmp;
+				_cur = max(_base);
+				return *this;
 			}
+			_cur = predecessor(_cur);
+			return *this;
+		}
 
-			map_iterator operator--(int)
+		tree_iterator		operator--(int)
+		{
+			tree_iterator	tmp(*this);
+			operator--();
+			return tmp;
+		}
+
+		operator			tree_iterator<const T, Node> (void)
+		{
+			return tree_iterator<const T, Node>(_base, _end, _cur);
+		}
+
+	private:
+		node_pointer	min(node_pointer node)
+		{
+			for ( ; node->left != _end; node = node->left);
+			return node;
+		}
+
+		node_pointer	max(node_pointer node)
+		{
+			for ( ; node->right != _end; node = node->right);
+			return node;
+		}
+
+		node_pointer	successor(node_pointer node)
+		{
+			if (node->right != _end)
+				return min(node->right);
+
+			node_pointer	tmp = node->parent;
+			while (tmp != _end && node == tmp->right)
 			{
-				map_iterator	tmp = *this;
-				--*this;
-				return tmp;
+				node = tmp;
+				tmp = tmp->parent;
 			}
+			return tmp;
+		}
 
-		private:
-			Node			*_begin;
-			Node			*_end;
-			key_compare		_comp;
+		node_pointer	predecessor(node_pointer node)
+		{
+			if (node->left != _end)
+				return max(node->left);
+
+			node_pointer	tmp = node->parent;
+			while (tmp != _end && node == tmp->left)
+			{
+				node = tmp;
+				tmp = tmp->parent;
+			}
+			return tmp;
+		}
+
+		node_pointer	_base;
+		node_pointer	_end;
+		node_pointer	_cur;
+
 	};
 
-	template <class Category, class T, class notconst_T = T>
-	class reverse_map_iterator
-	{
-		public:
-			typedef typename T::value_type		value_type;
-			typedef typename notconst_T::Node	Node;
-			typedef typename T::key_type		key_type;
-			typedef typename T::mapped_type		mapped_type;
-			typedef typename T::key_compare		key_compare;
-			typedef typename T::pointer			pointer;
-			typedef typename T::reference		reference;
-			typedef ptrdiff_t					difference_type;
-			typedef Category					iterator_category;
+template <class IteratorL, class IteratorR, class _Node>
+bool	operator==(tree_iterator<IteratorL, _Node> const& x, tree_iterator<IteratorR, _Node> const& y)
+{ return x.base() == y.base(); }
 
-			reverse_map_iterator() {}
-			reverse_map_iterator(const reverse_map_iterator<Category, notconst_T> &toCopy) : _begin(toCopy.base()), _end(toCopy.end()) {}
-			reverse_map_iterator(Node *node, Node *end)
-			{
-				this->_begin = node;
-				this->_end = end;
-			}
-
-			Node *base() const { return this->_begin; }
-			Node *end() const { return this->_end; }
-
-			virtual ~reverse_map_iterator() {}
-
-			reference operator*() const { return this->_begin->pair; }
-
-			bool operator!=(const reverse_map_iterator<Category, T, notconst_T> &other) const
-			{
-				return this->_begin != other._begin;
-			}
-
-			bool operator==(const reverse_map_iterator<Category, T, notconst_T> &other) const
-			{
-				return this->_begin == other._begin;
-			}
-
-			pointer operator->() const
-			{
-				if (this->_begin == nullptr)
-					return nullptr;
-				return &(operator*)();
-			}
-
-			reverse_map_iterator &operator++()
-			{
-				// find the smallest greater
-				if (this->_begin->left)
-				{
-					this->_begin = this->_begin->left->max();
-					return *this;
-				}
-				else if (this->_begin->parent)
-				{
-					// find first previous greater node
-					key_type key = this->_begin->pair.first;
-					Node *tmp = this->_begin->parent;
-					while (tmp && this->_comp(key, tmp->pair.first))
-						tmp = tmp->parent;
-					if (tmp)
-					{
-						this->_begin = tmp;
-						return *this;
-					}
-				}
-				this->_begin = this->_end;
-				return *this;
-			}
-
-			reverse_map_iterator &operator--()
-			{
-				// find the smallest greater
-				if (this->_begin->right)
-				{
-					this->_begin = this->_begin->right->min();
-					return *this;
-				}
-				else if (this->_begin->parent)
-				{
-					// find first previous greater node
-					key_type key = this->_begin->pair.first;
-					Node *tmp = this->_begin->parent;
-					while (tmp && this->_comp(tmp->pair.first, key))
-						tmp = tmp->parent;
-					if (tmp)
-					{
-						this->_begin = tmp;
-						return *this;
-					}
-				}
-				this->_begin = this->_end;
-				return *this;
-			}
-
-			reverse_map_iterator operator++(int)
-			{
-				reverse_map_iterator tmp = *this;
-				++*this;
-				return tmp;
-			}
-			reverse_map_iterator operator--(int)
-			{
-				reverse_map_iterator tmp = *this;
-				--*this;
-				return tmp;
-			}
-
-		private:
-			Node			*_begin;
-			Node			*_end;
-			key_compare		_comp;
-	};
+template <class IteratorL, class IteratorR, class _Node>
+bool	operator!=(tree_iterator<IteratorL, _Node> const& x, tree_iterator<IteratorR, _Node> const& y)
+{ return x.base() != y.base(); }
 }
